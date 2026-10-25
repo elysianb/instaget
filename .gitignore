@@ -1,0 +1,45 @@
+# Python bytecode / cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Python packaging
+build/
+dist/
+*.egg-info/
+
+# Local environment / secrets
+.env
+.env.*
+*.log
+
+# Instagram session and generated metadata
+instagram_session.json
+*.session
+*.session-journal
+*.json
+
+# Download outputs and local data
+downloads/
+output/
+out/
+results/
+*.txt
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# VS Code settings
+a/.vscode/
+.vscode/
+
+# PyInstaller
+*.spec

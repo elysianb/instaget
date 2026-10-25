@@ -77,6 +77,11 @@ def build_parser():
         "--password",
         help="Instagram password used only when the session file is missing or invalid.",
     )
+    parser.add_argument(
+        "--firefox-cookies",
+        action="store_true",
+        help="Authenticate with the Instagram session cookie from Firefox.",
+    )
     return parser
 
 
@@ -90,6 +95,38 @@ def ensure_single_action(parser, args):
 
 def resolve_session_path(args):
     return Path(args.session).expanduser()
+
+
+def login_from_firefox(client):
+    """Authenticate with the Instagram session cookie stored by Firefox."""
+
+    try:
+        import browser_cookie3
+    except ImportError as exc:
+        raise RuntimeError(
+            "Firefox cookie support requires browser-cookie3. "
+            "Install it with: python -m pip install browser-cookie3"
+        ) from exc
+
+    cookies = browser_cookie3.firefox(domain_name="instagram.com")
+    session_cookie = next(
+        (
+            cookie
+            for cookie in cookies
+            if cookie.name == "sessionid" and cookie.value
+        ),
+        None,
+    )
+
+    if session_cookie is None:
+        raise RuntimeError(
+            "No Instagram session cookie was found in Firefox. "
+            "Log in to Instagram in Firefox and retry."
+        )
+
+    logging.info("Authenticating with the Instagram session from Firefox.")
+    client.login_by_sessionid(session_cookie.value)
+    return client
 
 
 def login_and_save(client, session_path, username=None, password=None):
@@ -232,14 +269,20 @@ def main(argv=None):
     try:
         if args.list:
             logging.info("Starting collection listing flow.")
-            login_and_save(client, session_path, args.username, args.password)
+            if args.firefox_cookies:
+                login_from_firefox(client)
+            else:
+                login_and_save(client, session_path, args.username, args.password)
             list_collections(client)
             return 0
 
         if args.get:
             collection_name, output_file = args.get
             logging.info("Starting export flow for '%s' to '%s'.", collection_name, output_file)
-            login_and_save(client, session_path, args.username, args.password)
+            if args.firefox_cookies:
+                login_from_firefox(client)
+            else:
+                login_and_save(client, session_path, args.username, args.password)
             export_collection(client, collection_name, output_file)
             return 0
 

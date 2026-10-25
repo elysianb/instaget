@@ -11,7 +11,16 @@ For quick, scriptable Instagram collection workflows:
 
 ### 1) List collections
 
-List your saved Instagram collections
+List your saved Instagram collections using the session already open in Firefox:
+
+```powershell
+python .\instaget-savings.py --list --firefox-cookies
+```
+
+Firefox must be logged in to Instagram. The script reads the session cookie locally.
+
+
+Alternatively, you can authenticate with your Instagram credentials:
 
 ```powershell
 python .\instaget-savings.py --list --username YOUR_USERNAME --password YOUR_PASSWORD
@@ -19,7 +28,13 @@ python .\instaget-savings.py --list --username YOUR_USERNAME --password YOUR_PAS
 
 ### 2) Export one collection to a file
 
-Export all media links from a collection to a text file
+Export all media links from a collection to a text file, using Firefox's session:
+
+```powershell
+python .\instaget-savings.py --get "Animals" .\animals.txt --firefox-cookies
+```
+
+Alternatively, you can authenticate with your Instagram credentials:
 
 ```powershell
 python .\instaget-savings.py --get "Animals" .\animals.txt --username YOUR_USERNAME --password YOUR_PASSWORD
@@ -65,7 +80,9 @@ If `python` does not resolve correctly on your machine, use the full interpreter
 
 ## Notes
 
-- The export script needs a valid Instagram session or valid credentials.
+- `instaget-savings.py --firefox-cookies` uses the Instagram session cookie stored by Firefox. Firefox must be logged in to Instagram.
+- The export script can also authenticate with `--username` and `--password`, or reuse a saved session file specified with `--session`.
+- `instaget.py` uses Firefox cookies through `gallery-dl` and `yt-dlp` when downloading media.
 - Some downloads may require tools such as `ffmpeg`, `ffprobe`, `gallery-dl`, or `yt-dlp` depending on the content.
 - On Windows, if `py` fails or points to the wrong interpreter, prefer the explicit Python executable path.
 
